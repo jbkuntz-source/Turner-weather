@@ -1,4 +1,4 @@
-const CACHE = 'turner-pgh-v1';
+const CACHE = 'turner-v2';
 const ASSETS = ['/index.html', '/manifest.json', '/icon-192.png', '/icon-512.png'];
 
 self.addEventListener('install', e => {
@@ -16,10 +16,11 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
-  // Always network-first for weather API and painting images
+  // Network-first for weather, images, and geocoding
   if (e.request.url.includes('open-meteo.com') ||
       e.request.url.includes('wikipedia.org') ||
-      e.request.url.includes('wikimedia.org')) {
+      e.request.url.includes('wikimedia.org') ||
+      e.request.url.includes('openstreetmap.org')) {
     e.respondWith(fetch(e.request));
     return;
   }
