@@ -232,41 +232,52 @@
   <script>
   // ── Painting library (26 paintings) ─────────────────────────────────────
   const PAINTINGS = [
-    // SUNNY / CLEAR DAY (7)
-    { file:"Joseph_Mallord_William_Turner_-_Norham_Castle,_Sunrise_-_WGA23182.jpg", title:"Norham Castle, Sunrise", year:"c. 1845", mood:"luminous", group:"sunny" },
+    // SUNNY / CLEAR DAY (5 distinct paintings)
     { file:"The_Fighting_Temeraire,_JMW_Turner,_National_Gallery.jpg", title:"The Fighting Temeraire", year:"1839", mood:"golden", group:"sunny" },
-    { file:"Turner_-_Ulysses_deriding_Polyphemus_-_National_Gallery_file.jpg", title:"Ulysses Deriding Polyphemus", year:"1829", mood:"radiant", group:"sunny" },
-    { file:"Joseph_Mallord_William_Turner_-_Chichester_Canal_-_Google_Art_Project.jpg", title:"Chichester Canal", year:"c. 1828", mood:"serene", group:"sunny" },
-    { file:"Turner_-_Lake_Avernus-_Aeneas_and_the_Cumaean_Sibyl_-_Yale.jpg", title:"Lake Avernus: Aeneas and the Cumaean Sibyl", year:"c. 1814–15", mood:"gilded", group:"sunny" },
+    { file:"Chichester_Canal_(1828).jpg", title:"Chichester Canal", year:"c. 1828", mood:"serene", group:"sunny" },
     { file:"JMW_Turner_-_Dido_building_Carthage.jpg", title:"Dido Building Carthage", year:"1815", mood:"triumphant", group:"sunny" },
-    { file:"Joseph_Mallord_William_Turner_-_The_Lake,_Petworth,_Sunset;_Fighting_Bucks_-_Google_Art_Project.jpg", title:"The Lake, Petworth: Sunset", year:"c. 1829", mood:"warm", group:"sunny" },
+    { file:"Dort_or_Dordrecht_-_The_Dort_Packet-Boat_from_Rotterdam_Becalmed.jpg", title:"The Dort Packet-Boat from Rotterdam", year:"1818", mood:"still", group:"sunny" },
+    { file:"Turner,_The_Battle_of_Trafalgar_(1822).jpg", title:"The Battle of Trafalgar", year:"1822", mood:"vast", group:"sunny" },
+
+    // SUNRISE (4)
+    { file:"Joseph_Mallord_William_Turner_-_Norham_Castle,_Sunrise_-_WGA23182.jpg", title:"Norham Castle, Sunrise", year:"c. 1845", mood:"luminous", group:"sunrise" },
+    { file:"Joseph_Mallord_William_Turner_-_Norham_Castle,_Sunrise_(c.1798).jpg", title:"Norham Castle, Sunrise (watercolour)", year:"c. 1798", mood:"dawning", group:"sunrise" },
+    { file:"William_Turner_-_Sunrise_with_Sea_Monsters.JPG", title:"Sunrise with Sea Monsters", year:"c. 1845", mood:"ethereal", group:"sunrise" },
+    { file:"Joseph_Mallord_William_Turner_(1775-1851)_-_Sunrise,_with_a_Boat_between_Headlands_-_N02002_-_National_Gallery.jpg", title:"Sunrise, with a Boat between Headlands", year:"c. 1840", mood:"tender", group:"sunrise" },
+
+    // SUNSET (5)
+    { file:"Joseph_Mallord_William_Turner_(1775-1851)_-_Sunset_-_N01876_-_National_Gallery.jpg", title:"Sunset", year:"c. 1830–35", mood:"ablaze", group:"sunset" },
+    { file:"Joseph_Mallord_William_Turner_(1775-1851)_-_Sun_Setting_over_a_Lake_-_N04665_-_National_Gallery.jpg", title:"Sun Setting over a Lake", year:"c. 1840", mood:"dissolving", group:"sunset" },
+    { file:"Joseph_Mallord_William_Turner_(1775-1851)_-_Sunset_on_the_River_-_N02311_-_National_Gallery.jpg", title:"Sunset on the River", year:"c. 1840", mood:"fading", group:"sunset" },
+    { file:"Giudecca_Canal,_Looking_Towards_Fusina_at_Sunset_by_Turner.jpg", title:"Giudecca Canal, Looking Towards Fusina at Sunset", year:"1840", mood:"venetian", group:"sunset" },
+    { file:"Chichester_Canal_(1828).jpg", title:"Chichester Canal", year:"c. 1828", mood:"amber", group:"sunset" },
 
     // PARTLY CLOUDY (5)
-    { file:"Joseph_Mallord_William_Turner_-_Venice,_from_the_Porch_of_Madonna_della_Salute_-_WGA23197.jpg", title:"Venice, from the Porch of Madonna della Salute", year:"1835", mood:"hazy", group:"partly_cloudy" },
     { file:"William_Turner_-_Rain,_Steam_and_Speed_-_The_Great_Western_Railway.jpg", title:"Rain, Steam and Speed", year:"1844", mood:"charging", group:"partly_cloudy" },
-    { file:"Joseph_Mallord_William_Turner_-_Rotterdam_Ferry-Boat_-_WGA23183.jpg", title:"Rotterdam Ferry-Boat", year:"1833", mood:"breezy", group:"partly_cloudy" },
     { file:"Joseph_Mallord_William_Turner_-_Keelmen_Heaving_in_Coals_by_Moonlight_-_WGA23178.jpg", title:"Keelmen Heaving in Coals by Moonlight", year:"1835", mood:"industrial", group:"partly_cloudy" },
-    { file:"J.M.W.Turner_-_The_Grand_Canal_-_Venice_(Metmuseum).jpg", title:"The Grand Canal, Venice", year:"1835", mood:"shimmering", group:"partly_cloudy" },
+    { file:"Joseph_Mallord_William_Turner_-_Dutch_Boats_in_a_Gale_-_WGA23163.jpg", title:"Dutch Boats in a Gale", year:"1801", mood:"breezy", group:"partly_cloudy" },
+    { file:"J_M_W_Turner_-_Calais_Sands_at_Low_Water_-_Poissards_Collecting_Bait.jpg", title:"Calais Sands at Low Water", year:"1830", mood:"wide", group:"partly_cloudy" },
+    { file:"Blue_Rigi_painting.jpg", title:"The Blue Rigi, Sunrise", year:"1842", mood:"alpine", group:"partly_cloudy" },
 
     // OVERCAST / FOG (4)
-    { file:"Joseph_Mallord_William_Turner_-_'The_Sun_Rising_through_Vapour'_-_Google_Art_Project.jpg", title:"The Sun Rising through Vapour", year:"c. 1809", mood:"vaporous", group:"overcast" },
-    { file:"Joseph_Mallord_William_Turner_-_Venice_from_the_Lagoon_at_Sunset_-_WGA23200.jpg", title:"Venice from the Lagoon at Sunset", year:"c. 1840", mood:"dissolving", group:"overcast" },
-    { file:"Joseph_Mallord_William_Turner_-_Staffa,_Fingal's_Cave_-_Google_Art_Project.jpg", title:"Staffa, Fingal's Cave", year:"1832", mood:"brooding", group:"overcast" },
-    { file:"Joseph_Mallord_William_Turner_-_The_Harbours_of_England_-_WGA23174.jpg", title:"Dover Castle", year:"c. 1822", mood:"heavy", group:"overcast" },
+    { file:"Joseph_Mallord_William_Turner_-_Staffa,_Fingal%27s_Cave_-_Google_Art_Project.jpg", title:"Staffa, Fingal's Cave", year:"1832", mood:"brooding", group:"overcast" },
+    { file:"Turner_-_Sun_Rising_Through_Vapour.jpg", title:"Sun Rising through Vapour", year:"c. 1807", mood:"vaporous", group:"overcast" },
+    { file:"Joseph_Mallord_William_Turner_-_Buttermere_Lake,_with_Part_of_Cromackwater,_Cumberland,_a_Shower_-_WGA23140.jpg", title:"Buttermere Lake, a Shower", year:"1798", mood:"melancholic", group:"overcast" },
+    { file:"Joseph_Mallord_William_Turner_-_Dunstanburgh_Castle_-_Google_Art_Project.jpg", title:"Dunstanburgh Castle", year:"1798", mood:"heavy", group:"overcast" },
 
     // RAIN (3)
-    { file:"Joseph_Mallord_William_Turner_-_Buttermere_Lake,_with_Part_of_Cromackwater,_Cumberland,_a_Shower_-_WGA23140.jpg", title:"Buttermere Lake, a Shower", year:"1798", mood:"melancholic", group:"rain" },
-    { file:"Joseph_Mallord_William_Turner_-_Dunstanburgh_Castle_-_Google_Art_Project.jpg", title:"Dunstanburgh Castle", year:"1798", mood:"foreboding", group:"rain" },
     { file:"Turner_-_Fishermen_at_Sea.jpg", title:"Fishermen at Sea", year:"1796", mood:"perilous", group:"rain" },
+    { file:"Shipwreck_turner.jpg", title:"The Shipwreck", year:"1805", mood:"foreboding", group:"rain" },
+    { file:"Slave-ship.jpg", title:"The Slave Ship", year:"1840", mood:"dark", group:"rain" },
 
     // STORM (3)
-    { file:"Joseph_Mallord_William_Turner_-_Snow_Storm_-_Steam-Boat_off_a_Harbour's_Mouth_-_WGA23178.jpg", title:"Snow Storm: Steam-Boat off a Harbour's Mouth", year:"1842", mood:"tempestuous", group:"storm" },
-    { file:"Joseph_Mallord_William_Turner_-_The_Slave_Ship_-_WGA23178.jpg", title:"The Slave Ship", year:"1840", mood:"violent", group:"storm" },
-    { file:"Joseph_Mallord_William_Turner_-_Valley_of_Aosta-_Snowstorm,_Avalanche_and_Thunderstorm_-_1836-7_-_Art_Institute_Chicago.jpg", title:"Valley of Aosta: Snowstorm, Avalanche and Thunderstorm", year:"1836–37", mood:"elemental", group:"storm" },
+    { file:"Snow_Storm_-_Steam-Boat_off_a_Harbour%27s_Mouth.jpg", title:"Snow Storm: Steam-Boat off a Harbour's Mouth", year:"1842", mood:"tempestuous", group:"storm" },
+    { file:"Hannibal_in_the_Alps.jpg", title:"Snow Storm: Hannibal Crossing the Alps", year:"1812", mood:"elemental", group:"storm" },
+    { file:"Slave-ship.jpg", title:"The Slave Ship", year:"1840", mood:"violent", group:"storm" },
 
     // SNOW (2)
     { file:"JMW_Turner_-_Frosty_Morning.jpg", title:"Frosty Morning", year:"1813", mood:"hushed", group:"snow" },
-    { file:"Joseph_Mallord_William_Turner_-_Newark_Abbey_on_the_Wey.jpg", title:"Newark Abbey on the Wey", year:"c. 1807", mood:"wintry", group:"snow" },
+    { file:"Hannibal_in_the_Alps.jpg", title:"Snow Storm: Hannibal Crossing the Alps", year:"1812", mood:"wintry", group:"snow" },
 
     // NIGHT (2)
     { file:"Joseph_Mallord_William_Turner_-_Moonlight,_a_Study_at_Millbank_-_WGA23135.jpg", title:"Moonlight, a Study at Millbank", year:"1797", mood:"nocturnal", group:"night" },
@@ -290,6 +301,16 @@
 
   function getGroup(code, isDay) {
     if (!isDay) return "night";
+
+    // Check time of day for sunrise/sunset
+    const hour = new Date().getHours();
+    const isSunrise = hour >= 5 && hour <= 8;
+    const isSunset  = hour >= 18 && hour <= 21;
+
+    // For clear or partly cloudy skies at sunrise/sunset, use those groups
+    if (code <= 2 && isSunrise) return "sunrise";
+    if (code <= 2 && isSunset)  return "sunset";
+
     if (code === 0) return "sunny";
     if (code <= 2)  return "partly_cloudy";
     if (code === 3) return "overcast";
