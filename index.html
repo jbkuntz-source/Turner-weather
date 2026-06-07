@@ -6,10 +6,10 @@
   <meta name="theme-color" content="#0e0c0a"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
-  <meta name="apple-mobile-web-app-title" content="Turner · PGH"/>
+  <meta name="apple-mobile-web-app-title" content="Turner"/>
   <link rel="manifest" href="manifest.json"/>
   <link rel="apple-touch-icon" href="icon-192.png"/>
-  <title>Turner · Pittsburgh</title>
+  <title>Turner · Weather</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -21,13 +21,16 @@
       min-height: 100dvh;
       display: flex;
       flex-direction: column;
-      padding: env(safe-area-inset-top,0) env(safe-area-inset-right,0) env(safe-area-inset-bottom,0) env(safe-area-inset-left,0);
-      overflow: hidden;
+      padding-top: env(safe-area-inset-top, 0);
+      padding-bottom: env(safe-area-inset-bottom, 0);
+      overflow-x: hidden;
+      overflow-y: auto;
     }
 
+    /* Header */
     header {
       flex-shrink: 0;
-      padding: 18px 22px 10px;
+      padding: 16px 22px 8px;
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
@@ -38,93 +41,96 @@
       letter-spacing: 0.2em;
       text-transform: uppercase;
       color: #6a5e4e;
-      margin-bottom: 3px;
+      margin-bottom: 2px;
     }
 
-    .date-line { font-size: 13px; color: #9a8a78; }
-    .time-line { font-size: 21px; font-weight: 300; letter-spacing: -0.01em; text-align: right; color: #e8dece; }
-    .temp-line { font-size: 12px; color: #9a8a78; text-align: right; margin-top: 2px; }
+    .date-line { font-size: 12px; color: #9a8a78; }
+    .time-line { font-size: 20px; font-weight: 300; text-align: right; color: #e8dece; }
+    .temp-line { font-size: 12px; color: #9a8a78; text-align: right; margin-top: 1px; }
 
-    /* Painting area */
+    /* Weather summary bar */
+    #weather-bar {
+      flex-shrink: 0;
+      padding: 6px 22px 10px;
+      display: none;
+      align-items: baseline;
+      gap: 10px;
+    }
+
+    #weather-bar .condition {
+      font-size: 14px;
+      color: #c8b8a4;
+    }
+
+    #weather-bar .temp-big {
+      font-size: 22px;
+      font-weight: 300;
+      color: #e8dece;
+    }
+
+    /* Painting area — always shows full painting */
     #painting-area {
       flex: 1;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 0 0 0 0;
+      padding: 0 8px;
+      min-height: 200px;
       position: relative;
-      min-height: 0;
     }
 
     #painting-wrap {
       width: 100%;
-      height: 100%;
+      max-width: 700px;
       position: relative;
-      overflow: hidden;
+      display: none;
     }
 
     #painting-img {
       width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: center;
+      height: auto;
       display: block;
+      border-radius: 1px;
+      box-shadow: 0 4px 32px rgba(0,0,0,0.6), 0 1px 8px rgba(0,0,0,0.4);
       opacity: 0;
       transition: opacity 0.8s ease;
     }
 
     #painting-img.loaded { opacity: 1; }
 
-    /* Dark vignette over image bottom */
-    #painting-wrap::after {
-      content: '';
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      height: 55%;
-      background: linear-gradient(to top, rgba(14,12,10,0.92) 0%, rgba(14,12,10,0.3) 60%, transparent 100%);
-      pointer-events: none;
-    }
-
-    /* Painting title overlay — sits inside wrap, above gradient */
-    #painting-info {
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      padding: 0 22px 16px;
-      z-index: 2;
-    }
-
-    #painting-title {
-      font-size: 16px;
-      font-style: italic;
-      color: #e8dece;
-      line-height: 1.3;
-      margin-bottom: 3px;
-    }
-
-    #painting-year {
-      font-size: 11px;
-      letter-spacing: 0.1em;
-      color: #9a8a78;
-    }
-
-    /* Status / loading */
-    #status-wrap {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      height: 100%;
+    #status-msg {
       color: #5a4e40;
       font-style: italic;
       font-size: 13px;
       letter-spacing: 0.06em;
+      text-align: center;
+      padding: 20px;
     }
 
+    /* Painting caption */
+    #painting-caption {
+      padding: 10px 4px 0;
+      display: none;
+    }
+
+    #painting-title {
+      font-size: 15px;
+      font-style: italic;
+      color: #e8dece;
+      line-height: 1.3;
+      margin-bottom: 2px;
+    }
+
+    #painting-year {
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      color: #7a6e5e;
+    }
+
+    /* Footer */
     footer {
       flex-shrink: 0;
-      padding: 12px 22px 20px;
+      padding: 12px 22px 18px;
       border-top: 1px solid #1e1a14;
     }
 
@@ -132,6 +138,7 @@
       display: flex;
       justify-content: space-between;
       align-items: flex-end;
+      display: none;
     }
 
     .footer-label {
@@ -142,11 +149,11 @@
       margin-bottom: 3px;
     }
 
-    .footer-value { font-size: 14px; color: #c8b8a4; }
+    .footer-value { font-size: 13px; color: #c8b8a4; }
     .footer-value.italic { font-style: italic; }
 
     .byline {
-      margin-top: 10px;
+      margin-top: 8px;
       font-size: 9px;
       color: #2e2820;
       letter-spacing: 0.07em;
@@ -168,13 +175,21 @@
       border-radius: 1px;
     }
     #refresh-btn:active { background: #1a1610; }
+
+    /* Desktop: constrain width */
+    @media (min-width: 600px) {
+      body {
+        max-width: 520px;
+        margin: 0 auto;
+      }
+    }
   </style>
 </head>
 <body>
 
   <header>
     <div>
-      <div class="location-line">Pittsburgh, PA</div>
+      <div class="location-line" id="location-line">Locating…</div>
       <div class="date-line" id="date-line">—</div>
     </div>
     <div>
@@ -183,13 +198,16 @@
     </div>
   </header>
 
+  <div id="weather-bar">
+    <span class="temp-big" id="temp-big"></span>
+    <span class="condition" id="condition-val"></span>
+  </div>
+
   <div id="painting-area">
-    <div id="status-wrap" id="status-wrap">
-      <span id="status-msg">Reading the sky…</span>
-    </div>
-    <div id="painting-wrap" style="display:none;">
+    <span id="status-msg">Reading the sky…</span>
+    <div id="painting-wrap">
       <img id="painting-img" alt="Turner painting"/>
-      <div id="painting-info">
+      <div id="painting-caption">
         <div id="painting-title"></div>
         <div id="painting-year"></div>
       </div>
@@ -197,237 +215,72 @@
   </div>
 
   <footer>
-    <div class="footer-row" id="footer-data" style="display:none;">
+    <div class="footer-row" id="footer-data">
       <div>
         <div class="footer-label">Condition</div>
-        <div class="footer-value" id="condition-val">—</div>
+        <div class="footer-value" id="condition-footer">—</div>
       </div>
       <div style="text-align:right;">
         <div class="footer-label">Mood</div>
         <div class="footer-value italic" id="mood-val">—</div>
       </div>
     </div>
-    <div class="byline">J. M. W. Turner · British, 1775–1851 · Public domain</div>
+    <div class="byline">J. M. W. Turner · British, 1775–1851 · Public domain via Wikimedia</div>
     <button id="refresh-btn" onclick="nextPainting()">Another painting</button>
   </footer>
 
   <script>
-  // ── Painting library ──────────────────────────────────────────────────────
-  // Wikimedia Commons filenames — fetched via the thumbnail API at runtime.
-  // Format: { file, title, year, mood, weather: [...codes] }
-  // Weather groups: sunny (7 paintings), partly_cloudy (5), overcast/fog (4),
-  // rain (3), storm (3), snow (2), night (2) = 26 total
-
+  // ── Painting library (26 paintings) ─────────────────────────────────────
   const PAINTINGS = [
+    // SUNNY / CLEAR DAY (7)
+    { file:"Joseph_Mallord_William_Turner_-_Norham_Castle,_Sunrise_-_WGA23182.jpg", title:"Norham Castle, Sunrise", year:"c. 1845", mood:"luminous", group:"sunny" },
+    { file:"The_Fighting_Temeraire,_JMW_Turner,_National_Gallery.jpg", title:"The Fighting Temeraire", year:"1839", mood:"golden", group:"sunny" },
+    { file:"Turner_-_Ulysses_deriding_Polyphemus_-_National_Gallery_file.jpg", title:"Ulysses Deriding Polyphemus", year:"1829", mood:"radiant", group:"sunny" },
+    { file:"Joseph_Mallord_William_Turner_-_Chichester_Canal_-_Google_Art_Project.jpg", title:"Chichester Canal", year:"c. 1828", mood:"serene", group:"sunny" },
+    { file:"Turner_-_Lake_Avernus-_Aeneas_and_the_Cumaean_Sibyl_-_Yale.jpg", title:"Lake Avernus: Aeneas and the Cumaean Sibyl", year:"c. 1814–15", mood:"gilded", group:"sunny" },
+    { file:"JMW_Turner_-_Dido_building_Carthage.jpg", title:"Dido Building Carthage", year:"1815", mood:"triumphant", group:"sunny" },
+    { file:"Joseph_Mallord_William_Turner_-_The_Lake,_Petworth,_Sunset;_Fighting_Bucks_-_Google_Art_Project.jpg", title:"The Lake, Petworth: Sunset", year:"c. 1829", mood:"warm", group:"sunny" },
 
-    // ── SUNNY / CLEAR DAY (7) ─────────────────────────────────────────────
-    {
-      file: "Joseph_Mallord_William_Turner_-_Norham_Castle,_Sunrise_-_WGA23182.jpg",
-      title: "Norham Castle, Sunrise",
-      year: "c. 1845",
-      mood: "luminous",
-      group: "sunny"
-    },
-    {
-      file: "The_Fighting_Temeraire,_JMW_Turner,_National_Gallery.jpg",
-      title: "The Fighting Temeraire",
-      year: "1839",
-      mood: "golden",
-      group: "sunny"
-    },
-    {
-      file: "Turner_-_Ulysses_deriding_Polyphemus_-_National_Gallery_file.jpg",
-      title: "Ulysses Deriding Polyphemus",
-      year: "1829",
-      mood: "radiant",
-      group: "sunny"
-    },
-    {
-      file: "Joseph_Mallord_William_Turner_-_Chichester_Canal_-_Google_Art_Project.jpg",
-      title: "Chichester Canal",
-      year: "c. 1828",
-      mood: "serene",
-      group: "sunny"
-    },
-    {
-      file: "Turner_-_Lake_Avernus-_Aeneas_and_the_Cumaean_Sibyl_-_Yale.jpg",
-      title: "Lake Avernus: Aeneas and the Cumaean Sibyl",
-      year: "c. 1814–15",
-      mood: "gilded",
-      group: "sunny"
-    },
-    {
-      file: "JMW_Turner_-_Dido_building_Carthage.jpg",
-      title: "Dido Building Carthage",
-      year: "1815",
-      mood: "triumphant",
-      group: "sunny"
-    },
-    {
-      file: "Joseph_Mallord_William_Turner_-_The_Lake,_Petworth,_Sunset;_Fighting_Bucks_-_Google_Art_Project.jpg",
-      title: "The Lake, Petworth: Sunset, Fighting Bucks",
-      year: "c. 1829",
-      mood: "warm",
-      group: "sunny"
-    },
+    // PARTLY CLOUDY (5)
+    { file:"Joseph_Mallord_William_Turner_-_Venice,_from_the_Porch_of_Madonna_della_Salute_-_WGA23197.jpg", title:"Venice, from the Porch of Madonna della Salute", year:"1835", mood:"hazy", group:"partly_cloudy" },
+    { file:"William_Turner_-_Rain,_Steam_and_Speed_-_The_Great_Western_Railway.jpg", title:"Rain, Steam and Speed", year:"1844", mood:"charging", group:"partly_cloudy" },
+    { file:"Joseph_Mallord_William_Turner_-_Rotterdam_Ferry-Boat_-_WGA23183.jpg", title:"Rotterdam Ferry-Boat", year:"1833", mood:"breezy", group:"partly_cloudy" },
+    { file:"Joseph_Mallord_William_Turner_-_Keelmen_Heaving_in_Coals_by_Moonlight_-_WGA23178.jpg", title:"Keelmen Heaving in Coals by Moonlight", year:"1835", mood:"industrial", group:"partly_cloudy" },
+    { file:"J.M.W.Turner_-_The_Grand_Canal_-_Venice_(Metmuseum).jpg", title:"The Grand Canal, Venice", year:"1835", mood:"shimmering", group:"partly_cloudy" },
 
-    // ── PARTLY CLOUDY (5) ────────────────────────────────────────────────
-    {
-      file: "Joseph_Mallord_William_Turner_-_Venice,_from_the_Porch_of_Madonna_della_Salute_-_WGA23197.jpg",
-      title: "Venice, from the Porch of Madonna della Salute",
-      year: "1835",
-      mood: "hazy",
-      group: "partly_cloudy"
-    },
-    {
-      file: "William_Turner_-_Rain,_Steam_and_Speed_-_The_Great_Western_Railway.jpg",
-      title: "Rain, Steam and Speed",
-      year: "1844",
-      mood: "charging",
-      group: "partly_cloudy"
-    },
-    {
-      file: "Joseph_Mallord_William_Turner_-_Rotterdam_Ferry-Boat_-_WGA23183.jpg",
-      title: "Rotterdam Ferry-Boat",
-      year: "1833",
-      mood: "breezy",
-      group: "partly_cloudy"
-    },
-    {
-      file: "Joseph_Mallord_William_Turner_-_Keelmen_Heaving_in_Coals_by_Moonlight_-_WGA23178.jpg",
-      title: "Keelmen Heaving in Coals by Moonlight",
-      year: "1835",
-      mood: "industrial",
-      group: "partly_cloudy"
-    },
-    {
-      file: "J.M.W.Turner_-_The_Grand_Canal_-_Venice_(Metmuseum).jpg",
-      title: "The Grand Canal, Venice",
-      year: "1835",
-      mood: "shimmering",
-      group: "partly_cloudy"
-    },
+    // OVERCAST / FOG (4)
+    { file:"Joseph_Mallord_William_Turner_-_'The_Sun_Rising_through_Vapour'_-_Google_Art_Project.jpg", title:"The Sun Rising through Vapour", year:"c. 1809", mood:"vaporous", group:"overcast" },
+    { file:"Joseph_Mallord_William_Turner_-_Venice_from_the_Lagoon_at_Sunset_-_WGA23200.jpg", title:"Venice from the Lagoon at Sunset", year:"c. 1840", mood:"dissolving", group:"overcast" },
+    { file:"Joseph_Mallord_William_Turner_-_Staffa,_Fingal's_Cave_-_Google_Art_Project.jpg", title:"Staffa, Fingal's Cave", year:"1832", mood:"brooding", group:"overcast" },
+    { file:"Joseph_Mallord_William_Turner_-_The_Harbours_of_England_-_WGA23174.jpg", title:"Dover Castle", year:"c. 1822", mood:"heavy", group:"overcast" },
 
-    // ── OVERCAST / FOG (4) ──────────────────────────────────────────────
-    {
-      file: "Joseph_Mallord_William_Turner_-_'The_Sun_Rising_through_Vapour'_-_Google_Art_Project.jpg",
-      title: "The Sun Rising through Vapour",
-      year: "c. 1809",
-      mood: "vaporous",
-      group: "overcast"
-    },
-    {
-      file: "Joseph_Mallord_William_Turner_-_Venice_from_the_Lagoon_at_Sunset_-_WGA23200.jpg",
-      title: "Venice from the Lagoon at Sunset",
-      year: "c. 1840",
-      mood: "dissolving",
-      group: "overcast"
-    },
-    {
-      file: "Joseph_Mallord_William_Turner_-_Staffa,_Fingal's_Cave_-_Google_Art_Project.jpg",
-      title: "Staffa, Fingal's Cave",
-      year: "1832",
-      mood: "brooding",
-      group: "overcast"
-    },
-    {
-      file: "Joseph_Mallord_William_Turner_-_The_Harbours_of_England_-_WGA23174.jpg",
-      title: "Dover Castle",
-      year: "c. 1822",
-      mood: "heavy",
-      group: "overcast"
-    },
+    // RAIN (3)
+    { file:"Joseph_Mallord_William_Turner_-_Buttermere_Lake,_with_Part_of_Cromackwater,_Cumberland,_a_Shower_-_WGA23140.jpg", title:"Buttermere Lake, a Shower", year:"1798", mood:"melancholic", group:"rain" },
+    { file:"Joseph_Mallord_William_Turner_-_Dunstanburgh_Castle_-_Google_Art_Project.jpg", title:"Dunstanburgh Castle", year:"1798", mood:"foreboding", group:"rain" },
+    { file:"Turner_-_Fishermen_at_Sea.jpg", title:"Fishermen at Sea", year:"1796", mood:"perilous", group:"rain" },
 
-    // ── RAIN / DRIZZLE (3) ──────────────────────────────────────────────
-    {
-      file: "Joseph_Mallord_William_Turner_-_Buttermere_Lake,_with_Part_of_Cromackwater,_Cumberland,_a_Shower_-_WGA23140.jpg",
-      title: "Buttermere Lake, a Shower",
-      year: "1798",
-      mood: "melancholic",
-      group: "rain"
-    },
-    {
-      file: "Joseph_Mallord_William_Turner_-_Dunstanburgh_Castle_-_Google_Art_Project.jpg",
-      title: "Dunstanburgh Castle",
-      year: "1798",
-      mood: "foreboding",
-      group: "rain"
-    },
-    {
-      file: "Turner_-_Fishermen_at_Sea.jpg",
-      title: "Fishermen at Sea",
-      year: "1796",
-      mood: "perilous",
-      group: "rain"
-    },
+    // STORM (3)
+    { file:"Joseph_Mallord_William_Turner_-_Snow_Storm_-_Steam-Boat_off_a_Harbour's_Mouth_-_WGA23178.jpg", title:"Snow Storm: Steam-Boat off a Harbour's Mouth", year:"1842", mood:"tempestuous", group:"storm" },
+    { file:"Joseph_Mallord_William_Turner_-_The_Slave_Ship_-_WGA23178.jpg", title:"The Slave Ship", year:"1840", mood:"violent", group:"storm" },
+    { file:"Joseph_Mallord_William_Turner_-_Valley_of_Aosta-_Snowstorm,_Avalanche_and_Thunderstorm_-_1836-7_-_Art_Institute_Chicago.jpg", title:"Valley of Aosta: Snowstorm, Avalanche and Thunderstorm", year:"1836–37", mood:"elemental", group:"storm" },
 
-    // ── STORM (3) ───────────────────────────────────────────────────────
-    {
-      file: "Joseph_Mallord_William_Turner_-_Snow_Storm_-_Steam-Boat_off_a_Harbour's_Mouth_-_WGA23178.jpg",
-      title: "Snow Storm: Steam-Boat off a Harbour's Mouth",
-      year: "1842",
-      mood: "tempestuous",
-      group: "storm"
-    },
-    {
-      file: "Joseph_Mallord_William_Turner_-_The_Slave_Ship_-_WGA23178.jpg",
-      title: "The Slave Ship",
-      year: "1840",
-      mood: "violent",
-      group: "storm"
-    },
-    {
-      file: "Joseph_Mallord_William_Turner_-_Valley_of_Aosta-_Snowstorm,_Avalanche_and_Thunderstorm_-_1836-7_-_Art_Institute_Chicago.jpg",
-      title: "Valley of Aosta: Snowstorm, Avalanche and Thunderstorm",
-      year: "1836–37",
-      mood: "elemental",
-      group: "storm"
-    },
+    // SNOW (2)
+    { file:"JMW_Turner_-_Frosty_Morning.jpg", title:"Frosty Morning", year:"1813", mood:"hushed", group:"snow" },
+    { file:"Joseph_Mallord_William_Turner_-_Newark_Abbey_on_the_Wey.jpg", title:"Newark Abbey on the Wey", year:"c. 1807", mood:"wintry", group:"snow" },
 
-    // ── SNOW (2) ────────────────────────────────────────────────────────
-    {
-      file: "JMW_Turner_-_Frosty_Morning.jpg",
-      title: "Frosty Morning",
-      year: "1813",
-      mood: "hushed",
-      group: "snow"
-    },
-    {
-      file: "Joseph_Mallord_William_Turner_-_Newark_Abbey_on_the_Wey.jpg",
-      title: "Newark Abbey on the Wey",
-      year: "c. 1807",
-      mood: "wintry",
-      group: "snow"
-    },
-
-    // ── NIGHT (2) ───────────────────────────────────────────────────────
-    {
-      file: "Joseph_Mallord_William_Turner_-_Moonlight,_a_Study_at_Millbank_-_WGA23135.jpg",
-      title: "Moonlight, a Study at Millbank",
-      year: "1797",
-      mood: "nocturnal",
-      group: "night"
-    },
-    {
-      file: "Joseph_Mallord_William_Turner_-_Keelmen_Heaving_in_Coals_by_Moonlight_-_WGA23178.jpg",
-      title: "Keelmen Heaving in Coals by Moonlight",
-      year: "1835",
-      mood: "industrial night",
-      group: "night"
-    },
+    // NIGHT (2)
+    { file:"Joseph_Mallord_William_Turner_-_Moonlight,_a_Study_at_Millbank_-_WGA23135.jpg", title:"Moonlight, a Study at Millbank", year:"1797", mood:"nocturnal", group:"night" },
+    { file:"Joseph_Mallord_William_Turner_-_Keelmen_Heaving_in_Coals_by_Moonlight_-_WGA23178.jpg", title:"Keelmen Heaving in Coals by Moonlight", year:"1835", mood:"nocturnal", group:"night" },
   ];
 
-  // Wikimedia thumbnail URL builder
   function wikiImg(filename, width) {
     const encoded = encodeURIComponent(filename.replace(/ /g, '_'));
     return `https://en.wikipedia.org/w/index.php?title=Special:Redirect/file/${encoded}&width=${width}`;
   }
 
-  // ── Weather → painting group mapping ────────────────────────────────────
   const WMO = {
     0:"Clear sky",1:"Mainly clear",2:"Partly cloudy",3:"Overcast",
-    45:"Fog",48:"Freezing fog",
-    51:"Light drizzle",53:"Moderate drizzle",55:"Dense drizzle",
+    45:"Fog",48:"Freezing fog",51:"Light drizzle",53:"Moderate drizzle",55:"Dense drizzle",
     61:"Slight rain",63:"Moderate rain",65:"Heavy rain",
     71:"Slight snow",73:"Moderate snow",75:"Heavy snow",77:"Snow grains",
     80:"Slight showers",81:"Moderate showers",82:"Heavy showers",
@@ -435,13 +288,13 @@
     95:"Thunderstorm",96:"Thunderstorm w/ hail",99:"Thunderstorm w/ heavy hail"
   };
 
-  function getGroup(code, isDay, tempC) {
+  function getGroup(code, isDay) {
     if (!isDay) return "night";
     if (code === 0) return "sunny";
     if (code <= 2)  return "partly_cloudy";
     if (code === 3) return "overcast";
-    if (code <= 49) return "overcast";       // fog
-    if (code <= 57) return "rain";           // drizzle
+    if (code <= 49) return "overcast";
+    if (code <= 57) return "rain";
     if (code <= 67) return "rain";
     if (code <= 77) return "snow";
     if (code <= 82) return "rain";
@@ -450,12 +303,13 @@
     return "overcast";
   }
 
-  // ── State ────────────────────────────────────────────────────────────────
+  // State
   let currentGroup = "sunny";
   let groupPaintings = [];
-  let currentIndex  = 0;
+  let currentIndex = 0;
+  let triedIndices = new Set();
 
-  // ── Clock ────────────────────────────────────────────────────────────────
+  // Clock
   function updateClock() {
     const now = new Date();
     document.getElementById('time-line').textContent =
@@ -464,77 +318,153 @@
       now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
   }
 
-  // ── Show a painting ──────────────────────────────────────────────────────
+  // Show painting
   function showPainting(painting) {
-    const img   = document.getElementById('painting-img');
-    const wrap  = document.getElementById('painting-wrap');
-    const status = document.getElementById('status-wrap');
+    const img = document.getElementById('painting-img');
+    const wrap = document.getElementById('painting-wrap');
+    const caption = document.getElementById('painting-caption');
 
     img.classList.remove('loaded');
+
     document.getElementById('painting-title').textContent = painting.title;
-    document.getElementById('painting-year').textContent  =
-      `J. M. W. Turner  ·  ${painting.year}`;
+    document.getElementById('painting-year').textContent = `J. M. W. Turner  ·  ${painting.year}`;
     document.getElementById('mood-val').textContent = painting.mood;
 
     img.onload = () => {
-      status.style.display = 'none';
-      wrap.style.display   = 'block';
+      document.getElementById('status-msg').style.display = 'none';
+      wrap.style.display = 'block';
+      caption.style.display = 'block';
       document.getElementById('footer-data').style.display = 'flex';
       requestAnimationFrame(() => img.classList.add('loaded'));
     };
 
     img.onerror = () => {
-      // Try next painting in group on error
-      currentIndex = (currentIndex + 1) % groupPaintings.length;
-      showPainting(groupPaintings[currentIndex]);
+      triedIndices.add(currentIndex);
+      // Find an untried painting in the group
+      let found = false;
+      for (let i = 0; i < groupPaintings.length; i++) {
+        if (!triedIndices.has(i)) {
+          currentIndex = i;
+          found = true;
+          break;
+        }
+      }
+      if (found) {
+        showPainting(groupPaintings[currentIndex]);
+      } else {
+        document.getElementById('status-msg').textContent = 'Paintings unavailable';
+        document.getElementById('status-msg').style.display = 'block';
+      }
     };
 
     img.src = wikiImg(painting.file, 1200);
   }
 
-  // ── Cycle to next painting (same weather group) ──────────────────────────
   function nextPainting() {
-    if (groupPaintings.length === 0) return;
+    if (groupPaintings.length <= 1) return;
+    triedIndices.clear();
     currentIndex = (currentIndex + 1) % groupPaintings.length;
     const img = document.getElementById('painting-img');
     img.classList.remove('loaded');
     showPainting(groupPaintings[currentIndex]);
   }
 
-  // ── Main init ────────────────────────────────────────────────────────────
+  // Reverse geocode lat/lon to city name
+  async function getCityName(lat, lon) {
+    try {
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m&timezone=auto`;
+      const res = await fetch(url);
+      const data = await res.json();
+      // Open-Meteo doesn't return city name, so use the timezone as a rough label
+      const tz = data.timezone || '';
+      // Extract city from timezone like "America/New_York"
+      const city = tz.split('/').pop().replace(/_/g, ' ');
+      return city || `${lat.toFixed(1)}°, ${lon.toFixed(1)}°`;
+    } catch(e) {
+      return `${lat.toFixed(1)}°, ${lon.toFixed(1)}°`;
+    }
+  }
+
+  // Reverse geocode with Nominatim (free, no API key)
+  async function reverseGeocode(lat, lon) {
+    try {
+      const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&zoom=10`;
+      const res = await fetch(url);
+      const data = await res.json();
+      const addr = data.address || {};
+      const city = addr.city || addr.town || addr.village || addr.county || '';
+      const state = addr.state || '';
+      const country = addr.country_code ? addr.country_code.toUpperCase() : '';
+      if (city && state) return `${city}, ${state}`;
+      if (city && country) return `${city}, ${country}`;
+      if (city) return city;
+      return `${lat.toFixed(1)}°, ${lon.toFixed(1)}°`;
+    } catch(e) {
+      return `${lat.toFixed(1)}°, ${lon.toFixed(1)}°`;
+    }
+  }
+
+  // Main
   async function init() {
     updateClock();
     setInterval(updateClock, 30000);
 
-    const url = 'https://api.open-meteo.com/v1/forecast' +
-      '?latitude=40.4406&longitude=-79.9959' +
-      '&current=temperature_2m,weather_code,is_day' +
-      '&temperature_unit=celsius&timezone=America%2FNew_York';
+    document.getElementById('status-msg').style.display = 'block';
+    document.getElementById('status-msg').textContent = 'Reading the sky…';
+    document.getElementById('painting-wrap').style.display = 'none';
+    document.getElementById('painting-caption').style.display = 'none';
 
-    let code = 0, isDay = true, tempC = 15;
+    // Get location
+    let lat = 40.4406, lon = -79.9959; // Pittsburgh fallback
+    let locationName = 'Pittsburgh, PA';
 
     try {
+      const pos = await new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject, {
+          enableHighAccuracy: false,
+          timeout: 8000,
+          maximumAge: 600000 // cache location for 10 minutes
+        });
+      });
+      lat = pos.coords.latitude;
+      lon = pos.coords.longitude;
+      locationName = await reverseGeocode(lat, lon);
+    } catch(e) {
+      // Geolocation denied or unavailable — use Pittsburgh
+    }
+
+    document.getElementById('location-line').textContent = locationName;
+
+    // Fetch weather
+    let code = 0, isDay = true, tempC = 18;
+
+    try {
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
+        `&current=temperature_2m,weather_code,is_day&temperature_unit=celsius&timezone=auto`;
       const res = await fetch(url, { cache: 'no-store' });
       if (!res.ok) throw new Error();
       const data = await res.json();
       const c = data.current;
-      code  = c.weather_code;
+      code = c.weather_code;
       isDay = c.is_day === 1;
       tempC = c.temperature_2m;
       const tempF = Math.round(tempC * 9/5 + 32);
+
       document.getElementById('temp-line').textContent = `${tempF}°F · ${Math.round(tempC)}°C`;
+      document.getElementById('temp-big').textContent = `${tempF}°`;
       document.getElementById('condition-val').textContent = WMO[code] || `Code ${code}`;
+      document.getElementById('condition-footer').textContent = WMO[code] || `Code ${code}`;
+      document.getElementById('weather-bar').style.display = 'flex';
     } catch(e) {
-      document.getElementById('condition-val').textContent = '—';
-      document.getElementById('status-msg').textContent = 'Weather unavailable — showing a painting';
+      document.getElementById('condition-footer').textContent = '—';
     }
 
-    currentGroup   = getGroup(code, isDay, tempC);
+    // Pick paintings
+    currentGroup = getGroup(code, isDay);
     groupPaintings = PAINTINGS.filter(p => p.group === currentGroup);
-
-    // Shuffle so repeated opens feel fresh
     groupPaintings.sort(() => Math.random() - 0.5);
     currentIndex = 0;
+    triedIndices.clear();
 
     showPainting(groupPaintings[currentIndex]);
   }
